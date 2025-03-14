@@ -1,10 +1,26 @@
 
-POST http://localhost:3000/api/products
+POST http://localhost:3000/api/products HTTP/1.1
 Content-Type: application/json
 
 {
-    "name": "Product 1",
-    "description": "Description 1",
+    "name": "Product 3",
+    "description": "Description 3",
     "price": "100"
-    //"stock": "10"
+}
+
+###
+GET http://localhost:3000/api/products HTTP/1.1
+
+###
+GET http://localhost:3000/api/products/6dfcb591-582b-4b80-9b92-fb522f3e7d5c HTTP/1.1
+
+###
+DELETE http://localhost:3000/api/products/373bb658-3596-40b5-99b7-2d32aa8a5272 HTTP/1.1
+
+###
+PATCH http://localhost:3000/api/products/4eeb11a6-6595-45a9-8e0a-6ba489cfcb81 HTTP/1.1`
+Content-Type: application/json
+
+{
+    "price":"500"
 }
