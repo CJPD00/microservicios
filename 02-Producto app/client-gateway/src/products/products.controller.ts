@@ -6,6 +6,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -16,6 +17,8 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 //import { ErrorInterface } from 'src/common/interfaces/errorInterface';
 //import { ProductInterface } from 'src/common/interfaces/productInterface';
 import { PRODUCT_SERVICE } from 'src/config/services';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -24,8 +27,11 @@ export class ProductsController {
   ) {}
 
   @Post()
-  createProduct(@Body() body: any) {
-    return this.productsService.send({ cmd: 'create_product' }, body);
+  createProduct(@Body() createProductDto: CreateProductDto) {
+    return this.productsService.send(
+      { cmd: 'create_product' },
+      createProductDto,
+    );
   }
 
   @Get()
@@ -56,12 +62,25 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  updateProduct(@Param('id') id: string, @Body() body: any) {
-    return 'Product updated ' + id + body;
+  updateProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productsService
+      .send({ cmd: 'update_product' }, { id, ...updateProductDto })
+      .pipe(
+        catchError((error) => {
+          throw new RpcException(error);
+        }),
+      );
   }
 
   @Delete(':id')
   removeProduct(@Param('id') id: string) {
-    return 'Product deleted' + id;
+    return this.productsService.send({ cmd: 'remove_product' }, { id }).pipe(
+      catchError((error) => {
+        throw new RpcException(error);
+      }),
+    );
   }
 }

@@ -9,19 +9,19 @@ POST HTTP://127.0.0.1:3000/api/products HTTP/1.1
 Content-Type: application/json
 
 {
-    "name":"Monitor",
+    "name":"casco",
     "price":"15.22"
     //"otro":"safasf"
 }
 
 ###
-PATCH HTTP://127.0.0.1:3000/api/products/5  HTTP/1.1
+PATCH HTTP://127.0.0.1:3000/api/products/7  HTTP/1.1
 Content-Type: application/json
 
 {
     "name":"mouse",
-    "price":"15.22"
+    "price":"23.22"
 }
 
 ###
-DELETE HTTP://127.0.0.1:3000/api/products/5 HTTP/1.1
+DELETE HTTP://127.0.0.1:3000/api/products/98 HTTP/1.1
