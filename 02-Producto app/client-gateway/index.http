@@ -25,3 +25,6 @@ Content-Type: application/json
 
 ###
 DELETE HTTP://127.0.0.1:3000/api/products/98 HTTP/1.1
+
+###
+GET HTTP://127.0.0.1:3000/api/orders/1 HTTP/1.1
