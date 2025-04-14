@@ -1,31 +1,42 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+//import { OrderStatus } from '@prisma/client';
 import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsPositive,
+  ArrayMinSize,
+  IsArray,
+  // IsBoolean,
+  // IsEnum,
+  // IsNumber,
+  // IsOptional,
+  // IsPositive,
+  ValidateNested,
 } from 'class-validator';
-import { OrderStatus, OrderStatusList } from '../enum/order.enum';
+//import { OrderStatusList } from '../enum/order.enum';
+import { Type } from 'class-transformer';
+import { OrderItemDto } from './order-item.dto';
 
 export class CreateOrderDto {
-  @IsNumber()
-  @IsPositive()
-  totalAmount: number;
+  // @IsNumber()
+  // @IsPositive()
+  // totalAmount: number;
 
-  @IsNumber()
-  @IsPositive()
-  totalItems: number;
+  // @IsNumber()
+  // @IsPositive()
+  // totalItems: number;
 
-  @IsEnum(OrderStatusList, {
-    message: `Status must be one of ${OrderStatusList}`,
-  })
-  @IsOptional()
-  status: OrderStatus = OrderStatus.PENDING;
+  // @IsEnum(OrderStatusList, {
+  //   message: `Status must be one of ${OrderStatusList}`,
+  // })
+  // @IsOptional()
+  // status: OrderStatus = OrderStatus.PENDING;
 
-  @IsOptional()
-  @IsBoolean()
-  paid: boolean = false;
+  // @IsOptional()
+  // @IsBoolean()
+  // paid: boolean = false;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
 }
