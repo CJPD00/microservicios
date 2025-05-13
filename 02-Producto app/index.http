@@ -5,12 +5,12 @@ Content-Type: application/json
 {
     "items": [
         {
-            "productId": 2000,
+            "productId": 8,
             "quantity": 5,
             "price": 10
         },
         {
-            "productId": 5,
+            "productId": 9,
             "quantity": 6,
             "price": 20
         }

@@ -17,7 +17,7 @@ import { OrderPaginationDto } from './dto/order-pagination-dto';
 //import { UpdateOrderDto } from './dto/update-order.dto';
 import { UpdateStatusDto } from './dto/update.status.dto';
 import { PRODUCT_SERVICE } from 'src/config/services';
-import { catchError } from 'rxjs';
+import { catchError, firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class OrdersService extends PrismaClient implements OnModuleInit {
@@ -34,16 +34,53 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
     this.logger.log('OrdersService initialized');
   }
 
-  create(createOrderDto: CreateOrderDto) {
-    const ids = [2, 3];
+  async create(createOrderDto: CreateOrderDto) {
+    const ids = createOrderDto.items.map((item) => item.productId);
 
-    const products = this.productsClient
-      .send({ cmd: 'validate_product' }, ids)
-      .pipe(
-        catchError((error) => {
-          throw new RpcException(error);
-        }),
+    try {
+      const products: any[] = await firstValueFrom(
+        this.productsClient.send({ cmd: 'validate_product' }, ids),
       );
+
+      const totalAmount = createOrderDto.items.reduce((total, orderItem) => {
+        const price = products.find(
+          (product) => product.id === orderItem.productId,
+        ).price;
+
+        return price * orderItem.quantity + total;
+      }, 0);
+
+      const totalItems = createOrderDto.items.reduce((total, orderItem) => {
+        return orderItem.quantity + total;
+      }, 0);
+
+      const orderItems = createOrderDto.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: products.find((product) => product.id === item.productId).price,
+      }));
+
+      //Crear una transaccion de base de datos
+      const order = await this.order.create({
+        data: {
+          totalAmount,
+          totalItems,
+          OrderItem: {
+            createMany: {
+              data: orderItems,
+            },
+          },
+        },
+      });
+
+      return order;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        //status:"200"
+      });
+    }
   }
 
   async findAll(orderPaginationDto: OrderPaginationDto) {
