@@ -17,7 +17,7 @@ import { OrderPaginationDto } from './dto/order-pagination-dto';
 //import { UpdateOrderDto } from './dto/update-order.dto';
 import { UpdateStatusDto } from './dto/update.status.dto';
 import { PRODUCT_SERVICE } from 'src/config/services';
-import { catchError, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class OrdersService extends PrismaClient implements OnModuleInit {
