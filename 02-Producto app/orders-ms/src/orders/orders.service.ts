@@ -71,9 +71,24 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
             },
           },
         },
+        include: {
+          OrderItem: {
+            select: {
+              productId: true,
+              quantity: true,
+              price: true,
+            },
+          },
+        },
       });
 
-      return order;
+      return {
+        ...order,
+        OrderItem: order.OrderItem.map((item) => ({
+          ...item,
+          name: products.find((product) => product.id === item.productId).name,
+        })),
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -115,7 +130,18 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
   async findOne(id: string) {
     //console.log('estoy aqui');
-    const result = await this.order.findUnique({ where: { id } });
+    const result = await this.order.findUnique({
+      where: { id },
+      include: {
+        OrderItem: {
+          select: {
+            productId: true,
+            quantity: true,
+            price: true,
+          },
+        },
+      },
+    });
 
     //console.log(result);
 
@@ -126,7 +152,18 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
       });
     }
 
-    return result;
+    const productsIds = result.OrderItem.map((item) => item.productId);
+    const products = await firstValueFrom(
+      this.productsClient.send({ cmd: 'validate_product' }, productsIds),
+    );
+
+    return {
+      ...result,
+      OrderItem: result.OrderItem.map((item) => ({
+        ...item,
+        name: products.find((product) => product.id === item.productId).name,
+      })),
+    };
   }
 
   async changeStatus(updateStatusDto: UpdateStatusDto) {
