@@ -19,3 +19,6 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3000/api/orders/6a36cc78-7fb7-4c1f-8210-379ccf1ef985 HTTP/1.1
+
+###
+GET http://localhost:3000/api/products HTTP/1.1
