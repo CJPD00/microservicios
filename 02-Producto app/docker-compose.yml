@@ -1,0 +1,32 @@
+
+services:
+  client-gateway:
+    build: ./client-gateway
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client-gateway/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3000
+      - NATS_SERVERS=nats://nats:4222
+  
+  nats:
+    image: nats:latest
+    ports:
+      - 4222:4222
+      - 8222:8222
+      - 6222:6222
+
+  prodcts-ms:
+    build: ./products-ms
+    ports:
+      - 3001:3001
+    volumes:
+      - ./products-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3001
+      - NATS_SERVERS=nats://nats:4222
+      - DATABASE_URL="file:./dev.db"
+    
