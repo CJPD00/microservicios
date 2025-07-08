@@ -22,9 +22,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(
-    @Inject(NATS_SERVICES) private readonly client: ClientProxy,
-  ) {}
+  constructor(@Inject(NATS_SERVICES) private readonly client: ClientProxy) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
@@ -33,7 +31,11 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() orderPaginationDto: OrderPaginationDto) {
-    return this.client.send('findAllOrders', orderPaginationDto);
+    return this.client.send('findAllOrders', orderPaginationDto).pipe(
+      catchError((error) => {
+        throw new RpcException(error);
+      }),
+    );
   }
 
   @Get(':id')
@@ -50,12 +52,10 @@ export class OrdersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() statusDto: StatusDto,
   ) {
-    return this.client
-      .send('changeOrderStatus', { id, ...statusDto })
-      .pipe(
-        catchError((error) => {
-          throw new RpcException(error);
-        }),
-      );
+    return this.client.send('changeOrderStatus', { id, ...statusDto }).pipe(
+      catchError((error) => {
+        throw new RpcException(error);
+      }),
+    );
   }
 }

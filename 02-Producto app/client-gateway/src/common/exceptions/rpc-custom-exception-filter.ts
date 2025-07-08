@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -10,10 +12,19 @@ import { ErrorInterface } from '../interfaces/errorInterface';
 @Catch(RpcException)
 export class RpcCustomExceptionFilter implements ExceptionFilter {
   catch(exception: RpcException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
+    const ctx = host.switchToHttp();     
     const response = ctx.getResponse();
 
     const rpcError = exception.getError() as ErrorInterface;
+
+    if (rpcError.toString().includes('Empty Response')) {
+      return response.status(500).json({
+        status: 500,
+        message: rpcError
+          .toString()
+          .substring(0, rpcError.toString().indexOf('(') - 1),
+      });
+    }
 
     //console.log(rpcError);
 

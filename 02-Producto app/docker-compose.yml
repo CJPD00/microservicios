@@ -3,7 +3,7 @@ services:
   client-gateway:
     build: ./client-gateway
     ports:
-      - 3000:3000
+      - ${CLIENT_GATEWAY_PORT}:3000
     volumes:
       - ./client-gateway/src:/usr/src/app/src
     command: npm run start:dev
@@ -29,4 +29,31 @@ services:
       - PORT=3001
       - NATS_SERVERS=nats://nats:4222
       - DATABASE_URL="file:./dev.db"
+
+  orders-ms:
+    depends_on:
+      - orders-db
+    build: ./orders-ms
+    ports:
+      - 3002:3002
+    volumes:
+      - ./orders-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3002
+      - NATS_SERVERS=nats://nats:4222
+      - DATABASE_URL=postgresql://postgres:c00120262364@orders-db:5432/ordersdb?schema=public
+
+  orders-db:
+    image: postgres:16.2
+    restart: always
+    volumes:
+      - ./orders-ms/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=ordersdb
+      - POSTGRES_HOST_AUTH_METHOD=md5
     
