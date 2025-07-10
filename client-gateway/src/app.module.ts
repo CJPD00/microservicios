@@ -4,7 +4,7 @@ import { OrdersModule } from './orders/orders.module';
 import { NatsModule } from './nats/nats.module';
 
 @Module({
-  imports: [ProductsModule, OrdersModule, NatsModule],
+  imports: [ProductsModule, OrdersModule, NatsModule,],
   controllers: [],
   providers: [],
 })
