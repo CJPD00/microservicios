@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable } from '@nestjs/common';
 import { envs } from 'config/envs';
 import { PaymentSessionDto } from 'dto/payment-session.dto';
@@ -34,12 +35,40 @@ export class PaymentsService {
     return session;
   }
 
-  async stripeWebhook(req: Request, res: Response) {
+  stripeWebhook(req: Request, res: Response) {
+    if (req.headers['stripe-signature'] === undefined) {
+      console.log('Missing Stripe Signature');
+      return res.status(400).send('Missing Stripe Signature');
+    }
+
     const sig = req.headers['stripe-signature'];
 
     let event: Stripe.Event;
+    let rawBody = '';
 
-    try {
-    } catch (error) {}
+    req.on('data', (chunk) => (rawBody += chunk));
+
+    req.on('end', () => {
+      try {
+        event = this.stripe.webhooks.constructEvent(
+          rawBody,
+          sig,
+          envs.signingSecret,
+        );
+        console.log(event);
+        switch (event.type) {
+          case 'charge.succeeded':
+            console.log('Charge succeeded');
+            break;
+          default:
+            console.log(`Unhandled event type ${event.type}`);
+        }
+      } catch (error) {
+        console.log(`Webhook Error: ${error}`);
+        return res.status(400).send(`Webhook Error: ${error}`);
+      }
+    });
+
+    return res.status(200).json({ received: true, signature: sig });
   }
 }

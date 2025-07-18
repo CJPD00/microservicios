@@ -12,7 +12,7 @@ export class PaymentsController {
     return this.paymentsService.createPaymentSession(body);
   }
 
-  @Get('acceptPayment')
+  @Get('success')
   acceptPayment() {
     return {
       ok: true,
@@ -20,7 +20,7 @@ export class PaymentsController {
     };
   }
 
-  @Get('cancelPayment')
+  @Get('cancel')
   cancelPayment() {
     return {
       ok: false,
@@ -29,7 +29,15 @@ export class PaymentsController {
   }
 
   @Post('webhook')
-  async webhook(@Req() req: Request, @Res() res: Response) {
+  webhook(@Req() req: Request, @Res() res: Response) {
     return this.paymentsService.stripeWebhook(req, res);
+  }
+
+  @Get('webhook')
+  webhookGet() {
+    return {
+      ok: true,
+      message: 'webhook',
+    };
   }
 }
