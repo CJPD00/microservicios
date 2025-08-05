@@ -47,4 +47,4 @@ Content-Type: application/json
 POST  http://localhost:3003/payments HTTP/1.1
 
 ###
-POST http://localhost:3003/payments/webhook HTTP/1.1
+GET http://localhost:3003/payments/success HTTP/1.1

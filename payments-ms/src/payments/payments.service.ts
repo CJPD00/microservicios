@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable } from '@nestjs/common';
 import { envs } from 'config/envs';
@@ -10,7 +12,7 @@ export class PaymentsService {
   private readonly stripe = new Stripe(envs.stripeSecret);
 
   async createPaymentSession(data: PaymentSessionDto) {
-    const { currency, items } = data;
+    const { currency, items, odrderId } = data;
     const lineItems = items.map((item) => ({
       price_data: {
         currency: currency,
@@ -24,7 +26,9 @@ export class PaymentsService {
 
     const session = await this.stripe.checkout.sessions.create({
       payment_intent_data: {
-        metadata: {},
+        metadata: {
+          orderId: odrderId,
+        },
       },
       line_items: lineItems,
       mode: 'payment',
@@ -56,9 +60,14 @@ export class PaymentsService {
           envs.signingSecret,
         );
         console.log(event);
+        let chargeSuceeded;
         switch (event.type) {
           case 'charge.succeeded':
-            console.log('Charge succeeded');
+            chargeSuceeded = event.data.object;
+            console.log({
+              metadata: chargeSuceeded.metadata,
+              orderId: chargeSuceeded.metadata.orderId,
+            });
             break;
           default:
             console.log(`Unhandled event type ${event.type}`);
