@@ -9,6 +9,8 @@ interface EnvVars {
   //NATS_SERVERS: string[];
   STRIPE_SECRET: string;
   SIGNING_SECRET: string;
+  STRIPE_SUCCESS_URL: string;
+  STRIPE_CANCEL_URL: string;
 }
 
 const envsSchema = joi
@@ -17,6 +19,8 @@ const envsSchema = joi
     //NATS_SERVERS: joi.array().items(joi.string()).required(),
     STRIPE_SECRET: joi.string().required(),
     SIGNING_SECRET: joi.string().required(),
+    STRIPE_SUCCESS_URL: joi.string().required(),
+    STRIPE_CANCEL_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -44,4 +48,6 @@ export const envs = {
   //natsServers: envVars.NATS_SERVERS,
   stripeSecret: envVars.STRIPE_SECRET,
   signingSecret: envVars.SIGNING_SECRET,
+  stripeSuccessUrl: envVars.STRIPE_SUCCESS_URL,
+  stripeCancelUrl: envVars.STRIPE_CANCEL_URL,
 };
