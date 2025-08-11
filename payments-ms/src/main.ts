@@ -19,14 +19,19 @@ async function bootstrap() {
     }),
   );
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.NATS,
-    options: {
-      servers: envs.natsServers,
+  app.connectMicroservice<MicroserviceOptions>(
+    {
+      transport: Transport.NATS,
+      options: {
+        servers: envs.natsServers,
+      },
     },
-  });
+    {
+      inheritAppConfig: true,
+    },
+  );
 
-  await app.startAllMicroservices()
+  await app.startAllMicroservices();
   await app.listen(envs.port ?? 3000);
 
   logger.log(`Payments Microservice running on port ${envs.port}`);

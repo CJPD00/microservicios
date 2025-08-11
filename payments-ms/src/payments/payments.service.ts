@@ -12,7 +12,7 @@ export class PaymentsService {
   private readonly stripe = new Stripe(envs.stripeSecret);
 
   async createPaymentSession(data: PaymentSessionDto) {
-    const { currency, items, odrderId } = data;
+    const { currency, items, orderId } = data;
     const lineItems = items.map((item) => ({
       price_data: {
         currency: currency,
@@ -27,7 +27,7 @@ export class PaymentsService {
     const session = await this.stripe.checkout.sessions.create({
       payment_intent_data: {
         metadata: {
-          orderId: odrderId,
+          orderId: orderId,
         },
       },
       line_items: lineItems,

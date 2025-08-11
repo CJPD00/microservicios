@@ -12,7 +12,7 @@ import {
 export class PaymentSessionDto {
 
   @IsString()
-  odrderId: string;
+  orderId: string;
 
   @IsString()
   currency: string;

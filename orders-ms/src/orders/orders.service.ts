@@ -18,6 +18,7 @@ import { OrderPaginationDto } from './dto/order-pagination-dto';
 import { UpdateStatusDto } from './dto/update.status.dto';
 import { NATS_SERVICES } from 'src/config/services';
 import { firstValueFrom } from 'rxjs';
+import { OrderWithProducts } from './interfaces/order-whit-products.interface';
 
 @Injectable()
 export class OrdersService extends PrismaClient implements OnModuleInit {
@@ -175,5 +176,31 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
         status: updateStatusDto.status,
       },
     });
+  }
+
+  async createSession(order: OrderWithProducts) {
+    try {
+      const result = await firstValueFrom(
+        this.client.send('create.payment.session', {
+          currency: 'usd',
+          items: [
+            {
+              name: 'test',
+              price: 5,
+              quantity: 1,
+            },
+          ],
+          // orderId: order.id,
+        }),
+      );
+
+      return result;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        //status:"200"
+      });
+    }
   }
 }
